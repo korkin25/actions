@@ -1,19 +1,17 @@
----
-
 name: Check Syntax
 
 on:
   push:
     paths:
-      - '.github/actions/**/*.yml'
-      - '.github/workflows/**/*.yml'
+      - '**/*.yml'
+      - '**/*.yaml'
   pull_request:
     paths:
-      - '.github/actions/**/*.yml'
-      - '.github/workflows/**/*.yml'
+      - '**/*.yml'
+      - '**/*.yaml'
 
 env:
-  ACTIONLINT_VERSION: 1.6.4
+  ACTIONLINT_VERSION: 1.6.25
   INSTALL_PATH: /usr/local/bin
 
 jobs:
@@ -47,14 +45,14 @@ jobs:
         run: |
           pip install --target=${{ env.INSTALL_PATH }} yamllint==${{ env.YAMLLINT_VERSION }}
 
-      - name: Check YAML Syntax in Custom Actions
+      - name: Check YAML Syntax for All Files
         run: |
-          for file in $(find .github/actions -name "*.yml"); do
+          for file in $(find . -name "*.yml" -o -name "*.yaml"); do
             yamllint "$file"
           done
 
       - name: Check GitHub Actions Workflow Syntax
         run: |
-          for file in $(find .github/workflows -name "*.yml"); do
+          for file in $(find .github/workflows -name "*.yml" -o -name "*.yaml"); do
             actionlint "$file"
           done
