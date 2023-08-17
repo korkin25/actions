@@ -26,7 +26,7 @@ jobs:
         id: get-yamllint-version
         run: |
           LATEST_VERSION=$(curl -s https://pypi.org/pypi/yamllint/json | jq -r .info.version)
-          echo "YAMLLINT_VERSION=$LATEST_VERSION" >> $GITHUB_ENV
+          echo "YAMLLINT_VERSION=${LATEST_VERSION}" >> "${GITHUB_ENV}"
 
       - name: Cache tools
         id: cache-tools
@@ -47,12 +47,12 @@ jobs:
 
       - name: Check YAML Syntax for All Files
         run: |
-          for file in $(find . -name "*.yml" -o -name "*.yaml"); do
+          find . -name "*.yml" -o -name "*.yaml" | while read -r file; do
             yamllint "$file"
           done
 
       - name: Check GitHub Actions Workflow Syntax
         run: |
-          for file in $(find .github/workflows -name "*.yml" -o -name "*.yaml"); do
+          find .github/workflows -name "*.yml" -o -name "*.yaml" | while read -r file; do
             actionlint "$file"
           done
