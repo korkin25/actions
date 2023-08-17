@@ -1,0 +1,36 @@
+name: 'Ansible Lint Action'
+description: 'Lints an Ansible playbook using ansible-lint'
+author: 'Your Name'
+inputs:
+  playbook:
+    description: 'Path to the Ansible playbook to be linted'
+    required: true
+    default: 'main.yaml'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      shell: bash
+      
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+      shell: bash
+
+    - name: Install ansible-lint
+      run: |
+        pip install ansible-lint
+      shell: bash
+        
+    - name: Install galaxy collections
+      run: |
+        ansible-galaxy collection install ansible.posix community.general
+      shell: bash
+        
+    - name: Run ansible-lint
+      run: |
+        ansible-lint ${{ inputs.playbook }}
+      shell: bash

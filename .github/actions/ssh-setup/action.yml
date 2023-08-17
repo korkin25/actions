@@ -1,0 +1,28 @@
+name: 'SSH Setup'
+description: 'Handles SSH key setup'
+inputs:
+  ssh-private-key:
+    description: 'Private SSH Key'
+    required: true
+  ssh-known-hosts:
+    description: 'SSH Known Hosts'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup SSH Keys
+      shell: bash
+      run: |
+        mkdir -p "${HOME}/.ssh"
+        cat << SSH_DEPLOY_PRIVATE_KEY > "${HOME}/.ssh/id_rsa"
+        ${{ inputs.ssh-private-key }}
+        SSH_DEPLOY_PRIVATE_KEY
+
+        cat << SSH_KNOWN_HOSTS > "${HOME}/.ssh/known_hosts"
+        ${{ inputs.ssh-known-hosts }}
+        SSH_KNOWN_HOSTS
+
+        sudo chmod -R go-rwx "${HOME}/.ssh"
+        sudo chown -R "${USER}:${USER}" "${HOME}/.ssh"
+
