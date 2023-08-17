@@ -12,7 +12,8 @@ on:
 
 env:
   ACTIONLINT_VERSION: 1.6.25
-  INSTALL_PATH: /usr/local/bin
+  YAMLLINT_CONFIG_PATH: "${{ github.workspace }}/.github/yamllint.yaml"
+  PIP_CACHE_DIR: "~/.cache/pip"
 
 jobs:
   lint:
@@ -22,35 +23,33 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Determine latest yamllint version
-        id: get-yamllint-version
-        run: |
-          LATEST_VERSION=$(curl -s https://pypi.org/pypi/yamllint/json | jq -r .info.version)
-          echo "YAMLLINT_VERSION=${LATEST_VERSION}" >> "${GITHUB_ENV}"
-
-      - name: Cache tools
-        id: cache-tools
-        uses: actions/cache@v3
+      - name: Cache pip data
+        uses: actions/cache@v2
         with:
-          path: ${{ env.INSTALL_PATH }}
-          key: tools-${{ env.ACTIONLINT_VERSION }}-${{ env.YAMLLINT_VERSION }}
+          path: ${{ env.PIP_CACHE_DIR }}
+          key: pip-data-${{ runner.os }}-${{ hashFiles('**/pip-requirements.txt') }}
+          restore-keys: |
+            pip-data-${{ runner.os }}-
+
+      - name: Cache actionlint
+        uses: actions/cache@v2
+        with:
+          path: ~/.local/bin/actionlint
+          key: actionlint-${{ env.ACTIONLINT_VERSION }}
 
       - name: Install actionlint
-        if: steps.cache-tools.outputs.cache-hit != 'true'
+        if: steps.cache-actionlint.outputs.cache-hit != 'true'
         run: |
-          curl -sSLf https://github.com/rhysd/actionlint/releases/download/v${{ env.ACTIONLINT_VERSION }}/actionlint_${{ env.ACTIONLINT_VERSION }}_linux_amd64.tar.gz | tar xzv -C ${{ env.INSTALL_PATH }}
+          curl -sSLf https://github.com/rhysd/actionlint/releases/download/v${{ env.ACTIONLINT_VERSION }}/actionlint_${{ env.ACTIONLINT_VERSION }}_linux_amd64.tar.gz | tar xzv -C ~/.local/bin/
 
-      - name: Install yamllint
-        if: steps.cache-tools.outputs.cache-hit != 'true'
-        run: |
-          pip install --target=${{ env.INSTALL_PATH }} yamllint==${{ env.YAMLLINT_VERSION }}
+      - name: Install pip packages
+        run: pip install --user -r pip-requirements.txt
 
       - name: Check YAML Syntax for All Files
         run: |
           find . -name "*.yml" -o -name "*.yaml" | while read -r file; do
-            yamllint -c "${GITHUB_WORKSPACE}/.github/yamllint.yaml" "$file"
+            yamllint -c ${{ env.YAMLLINT_CONFIG_PATH }} "$file"
           done
 
       - name: Check GitHub Actions Workflow Syntax
-        run: |
-          actionlint
+        run: ~/.local/bin/actionlint
