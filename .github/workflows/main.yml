@@ -1,28 +1,58 @@
-name: Check Custom Actions Syntax
+name: Check Syntax
 
 on:
   push:
     paths:
       - '.github/actions/**/*.yml'
+      - '.github/workflows/**/*.yml'
   pull_request:
     paths:
       - '.github/actions/**/*.yml'
+      - '.github/workflows/**/*.yml'
+
+env:
+  ACTIONLINT_VERSION: 1.6.4
+  INSTALL_PATH: /usr/local/bin
 
 jobs:
   lint:
-    name: Validate GitHub Actions Syntax
+    name: Validate Syntax
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install actionlint
+      - name: Determine latest yamllint version
+        id: get-yamllint-version
         run: |
-          curl -sSLf https://github.com/rhysd/actionlint/releases/download/v1.6.4/actionlint_1.6.4_linux_amd64.tar.gz | tar xzv
-          chmod +x actionlint
+          LATEST_VERSION=$(curl -s https://pypi.org/pypi/yamllint/json | jq -r .info.version)
+          echo "YAMLLINT_VERSION=$LATEST_VERSION" >> $GITHUB_ENV
 
-      - name: Check GitHub Actions Syntax in Custom Actions
+      - name: Cache tools
+        id: cache-tools
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.INSTALL_PATH }}
+          key: tools-${{ env.ACTIONLINT_VERSION }}-${{ env.YAMLLINT_VERSION }}
+
+      - name: Install actionlint
+        if: steps.cache-tools.outputs.cache-hit != 'true'
+        run: |
+          curl -sSLf https://github.com/rhysd/actionlint/releases/download/v${{ env.ACTIONLINT_VERSION }}/actionlint_${{ env.ACTIONLINT_VERSION }}_linux_amd64.tar.gz | tar xzv -C ${{ env.INSTALL_PATH }}
+
+      - name: Install yamllint
+        if: steps.cache-tools.outputs.cache-hit != 'true'
+        run: |
+          pip install --target=${{ env.INSTALL_PATH }} yamllint==${{ env.YAMLLINT_VERSION }}
+
+      - name: Check YAML Syntax in Custom Actions
         run: |
           for file in $(find .github/actions -name "*.yml"); do
-            ./actionlint "$file"
+            yamllint "$file"
+          done
+
+      - name: Check GitHub Actions Workflow Syntax
+        run: |
+          for file in $(find .github/workflows -name "*.yml"); do
+            actionlint "$file"
           done
