@@ -48,7 +48,7 @@ jobs:
       - name: Check YAML Syntax for All Files
         run: |
           find . -name "*.yml" -o -name "*.yaml" | while read -r file; do
-            yamllint "$file"
+            yamllint /.github/yamllint.yaml "$file"
           done
 
       - name: Check GitHub Actions Workflow Syntax
