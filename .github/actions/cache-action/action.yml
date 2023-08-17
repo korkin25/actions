@@ -29,17 +29,21 @@ runs:
     - name: Determine cache path based on OS and input
       id: cache-details
       run: |
-        if [[ "${{ runner.os }}" == "Linux" ]]; then
-          if [[ "${{ inputs.cache-name }}" == "packages" ]]; then
+        case "${{ inputs.cache-name }}" in
+          "packages")
             echo "path=/var/cache/apt" >> $GITHUB_ENV
-          elif [[ "${{ inputs.cache-name }}" == "pip" ]]; then
+            ;;
+          "pip")
             echo "path=${HOME}/.cache/pip" >> $GITHUB_ENV
-          elif [[ "${{ inputs.cache-name }}" == "ansible-galaxy" ]]; then
+            ;;
+          "ansible-galaxy")
             echo "path=${HOME}/.ansible/collections" >> $GITHUB_ENV
-          fi
-        else
-          exit 1
-        fi
+            ;;
+          *)
+            echo "Invalid cache-name: ${{ inputs.cache-name }}"
+            exit 1
+            ;;
+        esac
       shell: bash
 
     - name: Restore cache using CACHE_ID
