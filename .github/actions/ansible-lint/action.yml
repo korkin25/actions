@@ -1,3 +1,4 @@
+---
 name: 'Ansible Lint Action'
 description: 'Lints an Ansible playbook using ansible-lint'
 author: 'Your Name'
