@@ -48,14 +48,13 @@ jobs:
       - name: Check YAML Syntax for All Files
         run: |
           pwd
-          ls -lA
-          ls -l .github
+          env
           find . -name "*.yml" -o -name "*.yaml" | while read -r file; do
-            yamllint -c ~/.github/yamllint.yaml "$file"
+            yamllint -c /home/runner/work/actions/actions/.github/yamllint.yaml "$file"
           done
 
       - name: Check GitHub Actions Workflow Syntax
         run: |
           find .github/workflows -name "*.yml" -o -name "*.yaml" | while read -r file; do
-            actionlint  -config ~/.github/actionlint.yaml "$file"
+            actionlint  -config /home/runner/work/actions/actions/.github/actionlint.yaml "$file"
           done
