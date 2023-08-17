@@ -34,13 +34,14 @@ jobs:
             pip-data-${{ runner.os }}-${{ hashFiles('**/pip-requirements.txt') }}
 
       - name: Cache actionlint
+        id: cache_actionlint
         uses: actions/cache@v2
         with:
           path: ~/.local/bin/actionlint
           key: actionlint-${{ env.ACTIONLINT_VERSION }}
 
       - name: Install actionlint
-        if: steps.cache-actionlint.outputs.cache-hit != 'true'
+        if: steps.cache_actionlint.outputs.cache-hit != 'true'
         run: |
           mkdir -p "${HOME}/.local/bin"
           curl -sSLf https://github.com/rhysd/actionlint/releases/download/v${{ env.ACTIONLINT_VERSION }}/actionlint_${{ env.ACTIONLINT_VERSION }}_linux_amd64.tar.gz | tar xzv -C "${HOME}/.local/bin/"
