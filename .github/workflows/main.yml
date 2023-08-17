@@ -9,9 +9,8 @@ on:
     paths:
       - '**/*.yml'
       - '**/*.yaml'
-  
+
   workflow_dispatch:
-    
 
 env:
   ACTIONLINT_VERSION: 1.6.25
@@ -39,7 +38,6 @@ jobs:
         with:
           path: ~/.local/bin/actionlint
           key: actionlint-${{ env.ACTIONLINT_VERSION }}
-          
 
       - name: Install actionlint
         if: steps.cache-actionlint.outputs.cache-hit != 'true'
