@@ -9,6 +9,9 @@ on:
     paths:
       - '**/*.yml'
       - '**/*.yaml'
+  
+  workflow_dispatch:
+    
 
 env:
   ACTIONLINT_VERSION: 1.6.25
