@@ -13,7 +13,7 @@ runs:
     - name: Checkout code
       uses: actions/checkout@v2
       shell: bash
-      
+
     - name: Setup Python
       uses: actions/setup-python@v2
       with:
@@ -24,12 +24,12 @@ runs:
       run: |
         pip install ansible-lint
       shell: bash
-        
+
     - name: Install galaxy collections
       run: |
         ansible-galaxy collection install ansible.posix community.general
       shell: bash
-        
+
     - name: Run ansible-lint
       run: |
         ansible-lint ${{ inputs.playbook }}

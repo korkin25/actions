@@ -25,4 +25,3 @@ runs:
 
         sudo chmod -R go-rwx "${HOME}/.ssh"
         sudo chown -R "${USER}:${USER}" "${HOME}/.ssh"
-

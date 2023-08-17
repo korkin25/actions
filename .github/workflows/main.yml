@@ -13,16 +13,16 @@ jobs:
     name: Validate GitHub Actions Syntax
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Install actionlint
-      run: |
-        curl -sSLf https://github.com/rhysd/actionlint/releases/download/v1.6.4/actionlint_1.6.4_linux_amd64.tar.gz | tar xzv
-        chmod +x actionlint
+      - name: Install actionlint
+        run: |
+          curl -sSLf https://github.com/rhysd/actionlint/releases/download/v1.6.4/actionlint_1.6.4_linux_amd64.tar.gz | tar xzv
+          chmod +x actionlint
 
-    - name: Check GitHub Actions Syntax in Custom Actions
-      run: |
-        for file in $(find .github/actions -name "*.yml"); do
-          ./actionlint "$file"
-        done
+      - name: Check GitHub Actions Syntax in Custom Actions
+        run: |
+          for file in $(find .github/actions -name "*.yml"); do
+            ./actionlint "$file"
+          done
