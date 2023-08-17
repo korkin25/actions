@@ -47,7 +47,8 @@ jobs:
 
       - name: Check YAML Syntax for All Files
         run: |
-          ls -l /.github/yamllint.yaml
+          ls -l /
+          ls -l /.github
           find . -name "*.yml" -o -name "*.yaml" | while read -r file; do
             yamllint -c /.github/yamllint.yaml "$file"
           done
